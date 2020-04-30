@@ -1,37 +1,14 @@
-## Welcome to GitHub Pages
+## 虚拟网络技术杂记
 
-You can use the [editor on GitHub](https://github.com/bodhix/network-docs/edit/gh-pages/README.md) to maintain and preview the content for your website in Markdown files.
+不久前，一位大佬问了我一个问题：假设让你设计一个数据中心的网络系统，你能做出来吗？
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+我想了一段时间，然后回答：不能。
 
-### Markdown
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
+这个问题让我明显得感觉到，自己的知识太过零碎。因此，需要进行系统化地整理和积累，故在此记录下了。
 
-# Header 1
-## Header 2
-### Header 3
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
+2020-05-01 from **bodhix**
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/bodhix/network-docs/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
