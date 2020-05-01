@@ -1,8 +1,10 @@
+
+
 ## veth pair
 
 ### 简介
 
-veth 是 Linux 上的虚拟以太网设备。它可以单独使用，但更多情况下是成对使用，也就是 veth pair。veth pair 中的一个设备收到数据包之后，会发送到对端设备。
+veth 是 Linux 上的虚拟以太网设备。它可以单独使用，但更多情况下是成对使用，也就是 veth pair。veth pair 中的一个设备收到数据包之后，会发送到对端设备。（[Linux man](http://man7.org/linux/man-pages/man4/veth.4.html)）
 
 ### 使用场景
 veth pair 主要使用场景是实现不同网络命名空间（namespace）之间的通信。创建一对 veth pair，将两端分别添加到不同的网络命名空间，以实现不同命名空间之间的相互通信。veth pair 最重要的例子，应该就是容器（如 docker）之间的网络通信。
@@ -112,4 +114,46 @@ root@bodhix:~#
 
 ### 原理分析
 
-to be continued
+本小节，我们分析 veth-pair 是如何实现从一端设备收到数据包之后马上转发给对端设备的。
+
+```c
+[drivers/net/veth.c]
+```
+veth 通过其 net_device 的 priv 和对端的 veth 关联起来
+```c
+struct veth_priv {
+	struct net_device __rcu	*peer; // 关联对端设备
+	atomic64_t		dropped;
+	unsigned		requested_headroom;
+};
+```
+在内核协议栈中，设备进行数据包发送的时候，最终会调用 dev->netdev_ops->ndo_start_xmit。
+veth 设备的 ndo_start_xmit 被设置为 veth_xmit。
+```c
+static const struct net_device_ops veth_netdev_ops = {
+	.ndo_init            = veth_dev_init,
+	.ndo_open            = veth_open,
+	.ndo_stop            = veth_close,
+	.ndo_start_xmit      = veth_xmit, // 设置发送函数
+	...
+};
+```
+veth_xmit 的主要调用堆栈如下：
+
+```c
+veth_xmit(struct sk_buff *skb, struct net_device *dev)
+|-- dev_forward_skb(struct net_device *dev, struct sk_buff *skb)
+	|-- __dev_forward_skb(struct net_device *dev, struct sk_buff *skb)
+	|-- netif_rx_internal(struct sk_buff *skb)
+    	|-- enqueue_to_backlog
+    		|-- ____napi_schedule
+/*
+ 主要流程如下：
+ veth_xmit 通过本端 dev 找到对端的 dev，然后调用 dev_forward_skb 直接将数据包发送给对端 dev。
+ dev_forward_skb 先调用 __dev_forward_skb 将 skb 的接收设备设置为 dev，然后再调用
+ netif_rx_internal 将 skb 加入到 backlog，触发软中断，走网络设备收包流程。
+ */
+```
+
+关于网络设备收发包的流程，请看 [待定](xxx) 。
+
