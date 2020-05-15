@@ -44,11 +44,11 @@ LB，关联在 tier-1 网关上。只能关联在 tier-1 网关上，每个 tier
 
 图二：
 
-![1589557182035](D:\SourceCode\GitHub\network-docs\services\images\1589557182035.png)
+![1589557182035](https://bodhix.github.io/network-docs/services/images/1589557182035.png)
 
 图三：
 
-![1589557527735](D:\SourceCode\GitHub\network-docs\services\images\1589557527735.png)
+![1589557527735](https://bodhix.github.io/network-docs/services/images/1589557527735.png)
 
 #### 特点
 
