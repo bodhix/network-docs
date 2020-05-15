@@ -28,7 +28,7 @@ LB，关联在 tier-1 网关上。只能关联在 tier-1 网关上，每个 tier
 
 ![1589557307319](D:\SourceCode\GitHub\network-docs\services\images\1589557307319.png)
 
-##### 特点
+#### 特点
 
 1、客户端和服务器在 LB 的两侧：如 客户端在 Tier-1 的上行链路侧，服务器在 Tier-1 的下行链路侧。【外部 client 访问内部 server】
 
@@ -36,7 +36,7 @@ LB，关联在 tier-1 网关上。只能关联在 tier-1 网关上，每个 tier
 
 3、不需要做 LB SNAT，简单。
 
-##### 缺点
+#### 缺点
 
 1、集中式的，位于 Tier-1 网关（Service Router）上。不同 Tier-1 上的 segment 的东西向的流量需要被导到 Edge node 到达 SR，即使流量不需要经过 LB。
 
