@@ -1,4 +1,2 @@
-openstack
-
 ## OpenStack
 
