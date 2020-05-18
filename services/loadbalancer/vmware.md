@@ -6,19 +6,19 @@ VMware NSX-T Load Balancer 分析
 
 #### load balancer
 
-LB，关联在 tier-1 网关上。只能关联在 tier-1 网关上，每个 tier-1 网关只能关联一个 LB
+LB，关联在 tier-1 网关上。只能关联在 tier-1 网关上，每个 tier-1 网关只能关联一个 LB。
 
 #### virtual server
 
-一个 LB 可以定义多个 virtual server。每个 server 会有一个 vip 和 tcp / udp 端口。每个 virtual server 可以定义独立的策略
+一个 LB 可以定义多个 virtual server。每个 server 会有一个 vip 和 tcp / udp 端口。每个 virtual server 可以定义独立的策略。
 
 #### pool
 
-提供相同服务的一组服务器，可以使用 IP 地址，也可以使用 Group。LB 可以将流量导到多个 pool，一个 pool 也可以被多个 virtual server 引用
+提供相同服务的一组服务器，可以使用 IP 地址，也可以使用 Group。LB 可以将流量导到多个 pool，一个 pool 也可以被多个 virtual server 引用。
 
 #### monitor
 
-检测服务 / 应用的可用性。检测的方式可以是简单的 icmp，也可以是复杂的 https 请求。一个 pool 只能使用一个 monitor，但是一个 monitor 可以被多个 pool 使用
+检测服务 / 应用的可用性。检测的方式可以是简单的 icmp，也可以是复杂的 https 请求。一个 pool 只能使用一个 monitor，但是一个 monitor 可以被多个 pool 使用。
 
 ### 部署模式
 
@@ -26,7 +26,7 @@ LB，关联在 tier-1 网关上。只能关联在 tier-1 网关上，每个 tier
 
 图一：
 
-![1589557307319](D:\SourceCode\GitHub\network-docs\services\images\1589557307319.png)
+![1589557307319](https://bodhix.github.io/network-docs/services/images/1589557307319.png)
 
 #### 特点
 
@@ -44,11 +44,11 @@ LB，关联在 tier-1 网关上。只能关联在 tier-1 网关上，每个 tier
 
 图二：
 
-![1589557182035](D:\SourceCode\GitHub\network-docs\services\images\1589557182035.png)
+![1589557182035](https://bodhix.github.io/network-docs/services/images/1589557182035.png)
 
 图三：
 
-![1589557527735](D:\SourceCode\GitHub\network-docs\services\images\1589557527735.png)
+![1589557527735](https://bodhix.github.io/network-docs/services/images/1589557527735.png)
 
 #### 特点
 
