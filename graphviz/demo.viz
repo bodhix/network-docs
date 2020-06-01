@@ -1,0 +1,112 @@
+digraph rankdot {
+	compound=true
+	margin="0,0"
+	ranksep = .75
+	nodesep = 1
+	pad = .5
+	rankdir = LR
+
+	node [shape=record, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=14]
+	edge [style=dashed, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=11]
+
+	netnamespace [shape = plaintext, label = "net namespace 相关结构及部分关系"]
+
+	file [
+		color = cornflowerblue,
+		label = "<head> struct \n file |
+			... |
+			<inode> struct inode *f_inode; |
+			<ops> struct file_operations *f_op; |
+			... "
+	]
+
+	inode [
+		color = cornflowerblue,
+		label = "<head> struct \n inode  |
+			... |
+			<priv> void *i_private;"
+	]
+
+	ns_common [
+		color = sienna,
+		label = "<head> struct \n ns_common |
+			... |
+			<ops> struct proc_ns_operations *ops; |
+			··· "
+	]
+
+	proc_ns_ops [
+		color = darkviolet,
+		label = "<head> struct \n proc_ns_operations |
+			... |
+			<install> int (*install)(); |
+			... "
+	]
+
+	task [
+		color = red,
+		label = "<head> struct \n task_struct |
+			... |
+			<files> struct files_struct *files; |
+			... |
+			<nsproxy> struct nsproxy *nsproxy; |
+			... "
+	]
+
+	files [
+		color = cornflowerblue,
+		label = "<head> struct \n files_struct |
+			... |
+			<fdt> struct fdtable *fdt; |
+			... "
+	]
+
+	fdtable [
+		color = cornflowerblue,
+		label = "<head> struct \n fdtable |
+			... |
+			<file> struct file **fd; |
+			... "
+	]
+
+	file_array [
+		color = cornflowerblue,
+		label = " |
+			<ref> |
+			... |
+			|
+			"
+	]
+
+	nsproxy [
+		color = sienna,
+		label = "<head> struct \n nsproxy |
+			<count> atomic_t count; |
+			<uts> struct uts_namespace *uts_ns; |
+			<ipc> struct ipc_namespace *ipc_ns; |
+			<mnt> struct mnt_namespace *mnt__ns; |
+			<pid> struct pid_namespace *pid_ns_for_children; | 
+			<net> struct net *net_ns; |
+			<cgourp> struct cgroup_namespaace *cgoup_ns; "
+	]
+
+	net [
+		color = sienna,
+		label = "<head> struct \n net |
+			... |
+			<ns_comm> struct ns_common ns; |
+			... "
+	]
+
+	file:inode -> inode:head [color = cornflowerblue]
+	file:ops -> ns_file_operations:head
+	inode:priv -> ns_common:head [color = cornflowerblue]
+	task:nsproxy -> nsproxy:head
+	task:files -> files:head
+	files:fdt -> fdtable:head
+	fdtable:file -> file_array:nw
+	file_array:ref -> file:head
+	nsproxy:net -> net:head
+	net:ns_comm -> ns_common:head [style = solid]
+	ns_common:ops -> proc_ns_ops:head
+}
