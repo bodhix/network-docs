@@ -61,11 +61,11 @@ lrwxrwxrwx 1 root root 0 May 24 17:32 /proc/self/ns/net -> 'net:[4026532682]'
 ```c
 /* # ip netns add netns0 */
 netns_add [ip/ipnetns.c]
-    |-- create_netns_dir：创建 /var/run/netns 目录
+    |-- create_netns_dir // 创建 /var/run/netns 目录
     |-- mount
-    |-- openat：在 /var/run/netns 目录底下创建 netns0 文件
-    |-- unshare：参数为 CLONE_NETNS，前面有介绍，就是创建一个新的命名空间
-    |-- mount：mount /proc/self/ns/net 到 /var/run/netns/netns0
+    |-- openat // 在 /var/run/netns 目录底下创建 netns0 文件
+    |-- unshare // 参数为 CLONE_NETNS, 前面有介绍，就是创建一个新的命名空间
+    |-- mount // mount /proc/self/ns/net 到 /var/run/netns/netns0
 ```
 
 ```c
@@ -79,9 +79,9 @@ netns_add [ip/ipnetns.c]
 /* # ip netns exec netns0 ip link list */
 /* 在使用 execvp 执行一个命令之前，先使用 netns_switch 切换一下 netns */
 netns_switch [lib/namespace.c]
-    |-- open：就是打开 /var/run/netns/xxx
-    |-- setns：将当前进程 netns 设置为 xxx
-    |-- unshare：? 这个比较奇怪，前面使用 setns，这里为什么还 unshare ?
+    |-- open // 就是打开 /var/run/netns/xxx
+    |-- setns // 将当前进程 netns 设置为 xxx
+    |-- unshare // ? 这个比较奇怪，前面使用 setns，这里为什么还 unshare ?
     |-- ...
 ```
 
@@ -99,28 +99,66 @@ unshare [kernel/fork.c]
     |-- unshare_nsproxy_namespaces
     	|-- create_new_namespaces
     		|-- copy_net_ns
-    			|-- inc_net_namespaces：增加 user_name 中 netns 的计数
-    			|-- net_alloc：分配一个 struct net 结构（表示一个 netns）
-                |-- get_user_ns：增加 user_ns 的引用
-                |-- setup_net：调用 netns 所需功能的初始化函数
-                    |-- 遍历 pernet_list，调用 ops_init，也就是调用 pernet_list 元素的 init
-                |-- 将新建的 net 加入到 net_namespace_list 中（全局变量）
-	|-- switch_task_namespaces：将 task_struct 里面的 nsproxy 换成前面创建出来的 nsproxy 结构
+    			|-- inc_net_namespaces // 增加 user_name 中 netns 的计数
+    			|-- net_alloc // 分配一个 struct net 结构（表示一个 netns）
+                |-- get_user_ns // 增加 user_ns 的引用
+                |-- setup_net // 调用 netns 所需功能的初始化函数
+                    |--// 遍历 pernet_list, 调用 ops_init, 也就是调用 pernet_list 元素的 init
+                |--// 将新建的 net 加入到 net_namespace_list 中（全局变量）
+	|-- switch_task_namespaces // 将 task_struct 里面的 nsproxy 换成新建的 nsproxy 结构
 
 setns [kernel/nsproxy.c]
-	|-- proc_ns_fget：通过 fd 获取对应的 struct file 结构
-    |-- get_proc_ns： 通过 file 获取对应的 struct ns_common 结构 ns
-    |-- create_new_namespaces：返回 struct nsproxy 结构 new_nsproxy
-    |-- ns->ops->install：为当前进程设置新的 netns
+	|-- proc_ns_fget // 通过 fd 获取对应的 struct file 结构
+    |-- get_proc_ns // 通过 file 获取对应的 struct ns_common 结构 ns
+    |-- create_new_namespaces // 返回 struct nsproxy 结构 new_nsproxy
+    |-- ns->ops->install // 为 new_nsproxy 设置新的 netns
     |-- switch_stack_namespaces
-/* 注意 create_new_namespace 只是创建出一个新的 nsproxy，但是里面的内容都是 copy 老的
+/* 注意 create_new_namespace 只是创建出一个新的 nsproxy，并没有将进程的 netns 设置为指定的
  * 这里就需要通过 ops->install 去将新的 netns 设置到 nsproxy 中
  */
 
-/* 从上面可以看到，net namespace 有几个关键的数据结构，而且和文件系统关联起来了 */
+/* 再来看看修改设备的 netns 内核做了哪些动作 */
+rtnl_setlink [net/core/rtnetlink.c]
+	|-- do_setlink
+        |-- rtnl_link_get_net
+        |-- dev_change_net_namespace // 真正做切换 netns, 操作非常多, 简单点说，就是进行了一次反注册和注册 "a mini version of register_netdevice unregister_netdevice"
+        |-- put_net
+
+/* 从上面可以看到，net namespace 有几个关键的数据结构，而且和文件系统关联起来了
+ * 内核的一个个 namespace, 被暴露为 proc 底下的文件，而且可以被 mount (nsfs) 为文件持久化下来
+ */
 struct nsproxy; // 表示一个完整的 namespace（fs/uts/ipc/net/cgroup...）
 struct net; // 表示一个 netns
 struct ns_common; // 所有 namespace 通用的一些逻辑，内嵌在各个 namespace 结构里
+				  // 因此可以利用 container_of 由 ns_common 获取对应的 namespace
 extern list_head net_namespace_list; // 将系统中的所有 netns 串起来
+
+/* 对于 netlink, 内核收到的信息，会被封装成一个 struct sk_buff，给各个处理函数处理
+ * struct sk_buff --> struct sock --> struct  possible_net_t --> struct net
+ * 和 netns 关联起来，后续的操作，都会在这个 netns 上进行。
+ */
 ```
 
+最后三个问题：
+
+1、sk_buff 里面的 net 是怎么来的？
+
+```c
+/* 系统调用 socket */
+sock_create [net/socket.c]
+    |-- __sock_create // 第一个参数为 current->nsproxy->net_ns
+    	|-- pf->create
+    		|-- netlink_create
+    			|-- __netlink_create
+    				|-- sk_alloc
+    					|-- sk_prot_alloc
+    					|-- sock_net_set // 到这里，将 netns 设置到 struct sock 中
+```
+
+2、主机重启之后，netns 还会不会存在？
+
+-- 不复存在，因为系统不会持久化这些配置
+
+3、fib 等网络资源是怎么通过 netns 隔离的？
+
+-- 这些信息，都保存在 struct net 中。操作的时候，都是在 net 中操作的。

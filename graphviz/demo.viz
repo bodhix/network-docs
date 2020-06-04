@@ -78,13 +78,31 @@ digraph rankdot {
 			"
 	]
 
+	net_device [
+		color = cornflowerblue,
+		label = "<head> struct \n net_device |
+			... |
+			<dev_list> struct list_head dev_list; |
+			<name_hlist> struct hlist_head name_hlist; |
+			<index_hlist> struct hlist_head index_hlist; |
+			... |
+			<nd_net> possible_net_t nd_net; |
+			... "
+	]
+
+	possible_net [
+		label = "<head> struct \n possible_net_t |
+			<net> struct net *net; "
+	]
+
+
 	nsproxy [
 		color = sienna,
 		label = "<head> struct \n nsproxy |
 			<count> atomic_t count; |
 			<uts> struct uts_namespace *uts_ns; |
 			<ipc> struct ipc_namespace *ipc_ns; |
-			<mnt> struct mnt_namespace *mnt__ns; |
+			<mnt> struct mnt_namespace *mnt_ns; |
 			<pid> struct pid_namespace *pid_ns_for_children; | 
 			<net> struct net *net_ns; |
 			<cgourp> struct cgroup_namespaace *cgoup_ns; "
@@ -95,6 +113,10 @@ digraph rankdot {
 		label = "<head> struct \n net |
 			... |
 			<ns_comm> struct ns_common ns; |
+			... |
+			<name_head> struct hlist_head *dev_name_head; |
+			<base_head> struct list_head dev_base_head; |
+			<index_head> struct hlist_head *dev_index_head; |
 			... "
 	]
 
@@ -106,7 +128,9 @@ digraph rankdot {
 	files:fdt -> fdtable:head
 	fdtable:file -> file_array:nw
 	file_array:ref -> file:head
+	net_device:nd_net -> possible_net:head
+	possible_net:net -> net:head
 	nsproxy:net -> net:head
-	net:ns_comm -> ns_common:head [style = solid]
+	net:ns_comm -> ns_common:head [style = solid, dir = both]
 	ns_common:ops -> proc_ns_ops:head
 }

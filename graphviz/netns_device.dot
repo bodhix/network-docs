@@ -1,0 +1,59 @@
+digraph rankdot {
+	compound=true
+	margin="0,0"
+	ranksep = .75
+	nodesep = 1
+	pad = .5
+	rankdir = LR
+	node [shape=record, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=14]
+	edge [style=dashed, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=11]
+
+	netnamespace [shape = plaintext, label = "net-namespace 和 net-device 部分关系结构图"]
+
+	net2 [
+		color = sienna,
+		label = "<head> struct \n net |
+			... |
+			<ns_comm> struct ns_common ns; |
+			... |
+			<base_head> struct list_head dev_base_head; |
+			<name_head> struct hlist_head *dev_name_head; |
+			<index_head> struct hlist_head *dev_index_head; |
+			... "
+	]
+
+
+	net_device2 [
+		color = cornflowerblue,
+		label = "<head> struct \n net_device |
+			... |
+			<name_hlist> struct hlist_head name_hlist; |
+			<dev_list> struct list_head dev_list; |
+			<index_hlist> struct hlist_head index_hlist; |
+			... "
+	]
+
+
+	net_device3 [
+		color = cornflowerblue,
+		label = "<head> struct \n net_device |
+			... |
+			<name_hlist> struct hlist_head name_hlist; |
+			<dev_list> struct list_head dev_list; |
+			<index_hlist> struct hlist_head index_hlist; |
+			... "
+	]
+
+	net_device4 [
+		color = cornflowerblue,
+		label = "<head> struct \n net_device |
+			... |
+			<name_hlist> struct hlist_head name_hlist; |
+			<dev_list> struct list_head dev_list; |
+			<index_hlist> struct hlist_head index_hlist; |
+			... "
+	]
+
+	net2:base_head -> net_device2:dev_list -> net_device3:dev_list -> net_device4:dev_list [dir = both, weight = 10]
+	net_device4:dev_list:e -> net2:base_head:w [dir = both]
+}

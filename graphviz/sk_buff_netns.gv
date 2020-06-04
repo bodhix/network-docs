@@ -1,0 +1,45 @@
+digraph rankdot {
+	compound=true
+	margin="0,0"
+	ranksep = .75
+	nodesep = 1
+	pad = .5
+	rankdir = LR
+
+	node [shape=record, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=14]
+	edge [style = dashed, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=11]
+
+	epoll [shape = plaintext, label = "epoll 相关结构及部分关系"]
+
+	sk_buff [
+		color = cornflowerblue,
+		label = "<head> struct \n sk_buff |
+			... |
+			<sk> struct sock *sk; |
+			..."
+	]
+
+	sock [
+		color = sienna,
+		label = "<head> struct \n sock  |
+			... |
+			<possible_net_t> struct possible_net_t sk_net; |
+			..."
+	]
+
+	possible_net_t [
+		color = sienna,
+		label = "<head> struct \n possible_net_t |
+			<net> struct net *net; "
+	]
+
+	net [
+		color = darkviolet,
+		label = "<head> struct \n net |
+			... "
+	]
+
+	sk_buff:sk -> sock:head [color = sienna]
+	sock:possible_net_t -> possible_net_t:head [style = solid, color = sienna]
+	possible_net_t:net -> net:head [color = cornflowerblue]
+}
