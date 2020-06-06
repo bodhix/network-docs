@@ -88,7 +88,7 @@ netns_switch [lib/namespace.c]
 ```c
 /* # ip link set dev netns netns0 */
 /* 用户空间基本没有操作，就是发送 rtnl 给内核
- * 指定修改设备的 NET_NS 属性（ NET_NS_FD / NET_NS_PID）
+ * 指定修改设备的 NET_NS 属性（NET_NS_FD / NET_NS_PID）
  */
 ```
 
@@ -116,7 +116,13 @@ setns [kernel/nsproxy.c]
 /* 注意 create_new_namespace 只是创建出一个新的 nsproxy，并没有将进程的 netns 设置为指定的
  * 这里就需要通过 ops->install 去将新的 netns 设置到 nsproxy 中
  */
+```
 
+![task_file](https://bodhix.github.io/network-docs/dataplane/images/task_file.png)
+
+![file_netns]( https://bodhix.github.io/network-docs/dataplane/images/file_netns.png )
+
+```c
 /* 再来看看修改设备的 netns 内核做了哪些动作 */
 rtnl_setlink [net/core/rtnetlink.c]
 	|-- do_setlink
@@ -133,11 +139,15 @@ struct ns_common; // 所有 namespace 通用的一些逻辑，内嵌在各个 na
 				  // 因此可以利用 container_of 由 ns_common 获取对应的 namespace
 extern list_head net_namespace_list; // 将系统中的所有 netns 串起来
 
-/* 对于 netlink, 内核收到的信息，会被封装成一个 struct sk_buff，给各个处理函数处理
- * struct sk_buff --> struct sock --> struct  possible_net_t --> struct net
+/* 对于 netlink，内核收到的信息，会被封装成一个 struct sk_buff，给各个处理函数处理
+ * struct sk_buff --> struct sock --> struct possible_net_t --> struct net
  * 和 netns 关联起来，后续的操作，都会在这个 netns 上进行。
  */
 ```
+
+![sk_buff_netns](https://bodhix.github.io/network-docs/dataplane/images/sk_buff_netns.png)
+
+![netns_device]( https://bodhix.github.io/network-docs/dataplane/images/netns_device.png )
 
 最后三个问题：
 
