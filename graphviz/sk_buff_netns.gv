@@ -9,7 +9,7 @@ digraph rankdot {
 	node [shape=record, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=14]
 	edge [style = dashed, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=11]
 
-	epoll [shape = plaintext, label = "epoll 相关结构及部分关系"]
+	epoll [shape = plaintext, label = "sk_buff 和 netns 的关联关系"]
 
 	sk_buff [
 		color = cornflowerblue,
