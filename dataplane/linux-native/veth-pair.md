@@ -5,7 +5,7 @@
 veth 是 Linux 上的虚拟以太网设备。它可以单独使用，但更多情况下是成对使用，也就是 veth pair。veth pair 中的一个设备收到数据包之后，会发送到对端设备。（[Linux man](http://man7.org/linux/man-pages/man4/veth.4.html)）
 
 ### 使用场景
-veth pair 主要使用场景是实现不同网络命名空间（namespace）之间的通信。创建一对 veth pair，将两端分别添加到不同的网络命名空间，以实现不同命名空间之间的相互通信。veth pair 最重要的例子，应该就是容器（如 docker）之间的网络通信。
+veth pair 主要使用场景是实现不同网络命名空间 [net-namespace](net-namespace) 之间的通信。创建一对 veth pair，将两端分别添加到不同的网络命名空间，以实现不同命名空间之间的相互通信。veth pair 最重要的例子，应该就是容器（如 docker）之间的网络通信。
 
 ### 使用方法
 
@@ -153,5 +153,5 @@ veth_xmit(struct sk_buff *skb, struct net_device *dev)
  */
 ```
 
-关于网络设备收发包的流程，请看 [待定](xxx) 。
+关于网络设备收发包的流程，请看 [Linux 网络协议栈](kernel-stack) 。
 
