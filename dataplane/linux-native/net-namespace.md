@@ -4,7 +4,7 @@
 
 namespace（命名空间）为 Linux 上的资源对象提供多个视图，实现资源的隔离，是容器技术的基础。Linux 为众多的资源提供 namespace，这里介绍和网络相关的，网络命名空间（netns）([Linux man]( http://man7.org/linux/man-pages/man7/network_namespaces.7.html ))。
 
-netns 隔离了一切的网络资源，包括网络设备、邻居表、路由器表等。不同 netns 之间的这些资源都是不可见的。netns 之间的连通，主要依靠 [veth pair](veth-pair-link)。
+netns 隔离了一切的网络资源，包括网络设备、邻居表、路由器表等。不同 netns 之间的这些资源都是不可见的。netns 之间的连通，主要依靠 [veth pair](veth-pair)。
 
 ### 使用场景
 
