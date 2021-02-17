@@ -5,10 +5,11 @@ digraph rankdot {
 	nodesep = 1
 	pad = .5
 	rankdir = LR
-	node [shape=record, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=14]
-	edge [style=dashed, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=11]
 
-	netnamespace [shape = plaintext, label = "net-namespace 和 net-device 部分关系结构图"]
+	node [shape=record, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=14]
+	edge [style = dashed, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=11]
+
+	netnamespace [shape = plaintext, label = "netns 和 net_device 的关联关系"]
 
 	net2 [
 		color = sienna,

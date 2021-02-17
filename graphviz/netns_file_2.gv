@@ -1,0 +1,73 @@
+digraph rankdot {
+	compound=true
+	margin="0,0"
+	ranksep = .75
+	nodesep = 1
+	pad = .5
+	rankdir = LR
+
+	node [shape=record, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=14]
+	edge [style = dashed, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=11]
+
+	file_netns [shape = plaintext, label = "netns 和 file 的关联关系"]
+
+	file [
+		color = cornflowerblue,
+		label = " <head> struct \n file |
+			... |
+			<inode> struct inode *f_inode; |
+			<ops> struct file_operations *f_op; |
+			... "
+	]
+
+	inode [
+		color = cornflowerblue,
+		label = "<head> struct \n inode  |
+			... |
+			<priv> void *i_private;"
+	]
+
+	ns_common [
+		color = sienna,
+		label = "<head> struct \n ns_common |
+			... |
+			<ops> struct proc_ns_operations *ops; |
+			... "
+	]
+
+	proc_ns_ops [
+		color = darkviolet,
+		label = "<head> struct \n proc_ns_operations |
+			... |
+			<install> int (*install)(); |
+			... "
+	]
+
+
+	nsproxy [
+		color = sienna,
+		label = "<head> struct \n nsproxy |
+			... | 
+			<net> struct net *net_ns; |
+			... "
+	]
+
+	net [
+		color = sienna,
+		label = "<head> struct \n net |
+			... |
+			<ns_comm> struct ns_common ns; |
+			... |
+			<name_head> struct hlist_head *dev_name_head; |
+			<base_head> struct list_head dev_base_head; |
+			<index_head> struct hlist_head *dev_index_head; |
+			... "
+	]
+
+	file:inode -> inode:head [color = cornflowerblue]
+	file:ops -> ns_file_operations:head
+	inode:priv -> ns_common:head [color = cornflowerblue]
+	nsproxy:net -> net:head
+	net:ns_comm -> ns_common:head [style = solid, dir = both]
+	ns_common:ops -> proc_ns_ops:head
+}

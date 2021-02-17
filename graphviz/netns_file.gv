@@ -1,0 +1,64 @@
+digraph rankdot {
+	compound=true
+	margin="0,0"
+	ranksep = .75
+	nodesep = 1
+	pad = .5
+	rankdir = LR
+
+	node [shape=record, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=14]
+	edge [style = dashed, charset = "UTF-8" fontname="Microsoft YaHei", fontsize=11]
+
+	task_file [shape = plaintext, label = "file 和 task_struct 的关联关系"]
+
+	task [
+		color = red,
+		label = "<head> struct \n task_struct |
+			... |
+			<files> struct files_struct *files; |
+			... |
+			<nsproxy> struct nsproxy *nsproxy; |
+			... "
+	]
+
+	files [
+		color = cornflowerblue,
+		label = "<head> struct \n files_struct |
+			... |
+			<fdt> struct fdtable *fdt; |
+			... "
+	]
+
+	fdtable [
+		color = cornflowerblue,
+		label = "<head> struct \n fdtable |
+			... |
+			<file> struct file **fd; |
+			... "
+	]
+
+	file_array [
+		color = cornflowerblue,
+		label = " |
+			<ref> |
+			... |
+			|
+			"
+	]
+
+	
+	file [
+		color = cornflowerblue,
+		label = " <head> struct \n file |
+			... |
+			<inode> struct inode *f_inode; |
+			<ops> struct file_operations *f_op; |
+			... "
+	]
+
+	
+	task:files -> files:head
+	files:fdt -> fdtable:head
+	fdtable:file -> file_array:nw
+	file_array:ref -> file:head
+}
