@@ -7,9 +7,9 @@
 seccomp 主要经历两个阶段：
 
 1. 从内核2.6.23引入的，通过 prctl 设置，设置之后，该进程只支持以下四个基本的系统调用：read / write / _exit / sigreturn。由于限制太死了，并不是很实用。
-2. 在内核3.5，使用基于 BPF 的系统调用过滤功能，渐渐强大起来。支持指定 filter 以及对于的 action。不过，实际编写 BPF 还是比较麻烦，所以就有了 libseccomp 库，使用就比较方便了。
+2. 在内核3.5，使用基于 BPF 的系统调用过滤功能，渐渐强大起来。支持指定 filter 以及对于的 action。不过，实际编写 BPF 还是比较麻烦，所以就有了 [libseccomp](https://github.com/seccomp/libseccomp) 库，使用就比较方便了。
 
-当前的使用，则表现为两者 seccomp 模式：
+当前的使用，则表现为两种 seccomp 模式：
 
 1. SECCOMP_SET_MODE_STRICT
 2. SECCOMP_SET_MODE_FILTER
@@ -127,4 +127,10 @@ int main()
 ### 参考资料
 
 1. [Seccomp Notify – New Frontiers in Unprivileged Container Development](https://people.kernel.org/brauner/the-seccomp-notifier-new-frontiers-in-unprivileged-container-development)
+
+2. [libseccomp](https://github.com/seccomp/libseccomp)
+
+3. [Introduction to seccomp: BPF linux syscall filter](https://www.cnblogs.com/dream397/p/14209766.html)
+
+   
 
