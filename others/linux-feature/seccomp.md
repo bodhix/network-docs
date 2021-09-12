@@ -2,12 +2,17 @@
 
 ### 简介
 
-之前只知道，Docker 使用的核心技术是 namespace 和 cgroup。这几天，发现一个新的技术点：seccomp。seccomp 是 secure computing mode 的缩写，意为构造一个安全的计算环境 -- 限制服务对系统调用（syscal）的使用。
+之前只知道，Docker 使用的核心技术是 namespace 和 cgroup。这几天，发现一个新的技术点：seccomp。seccomp 是 secure computing mode 的缩写，意为构造一个安全的计算环境 -- 限制服务对系统调用（syscall）的使用。
 
 seccomp 主要经历两个阶段：
 
 1. 从内核2.6.23引入的，通过 prctl 设置，设置之后，该进程只支持以下四个基本的系统调用：read / write / _exit / sigreturn。由于限制太死了，并不是很实用。
 2. 在内核3.5，使用基于 BPF 的系统调用过滤功能，渐渐强大起来。支持指定 filter 以及对于的 action。不过，实际编写 BPF 还是比较麻烦，所以就有了 libseccomp 库，使用就比较方便了。
+
+当前的使用，则表现为两者 seccomp 模式：
+
+1. SECCOMP_SET_MODE_STRICT
+2. SECCOMP_SET_MODE_FILTER
 
 ### 过滤条件 filter
 
@@ -30,9 +35,9 @@ seccomp 主要经历两个阶段：
 
 以上通过 man seccomp_rule_add 可以获取相关信息。
 
+**这里面可能最有意思的，应该是 ACT_NOTIFY 了，触发通知，可以做很多事情。而且，如果使用 notify，那么调用对应系统调用的进程会被 block 住，直到监控进程有对应的 seccomp_notify_respond。**
 
-
-这里面可能最有意思的，应该是 ACT_NOTIFY 了，触发通知，可以做很多事情。而且，如果使用 notify，那么调用对应系统调用的进程会被 block 住，直到监控进程有对应的 seccomp_notify_respond。
+简单的示例程序：
 
 ```c
 /* test for linux-feature
@@ -41,8 +46,7 @@ seccomp 主要经历两个阶段：
 #include <stdio.h>          // for printf
 #include <sys/prctl.h>      // for prctl
 #include <linux/seccomp.h>  // for seccomp constant
-#include <unistd.h>         // for dup / fork / access
-#include <sys/types.h>      // for pid_t
+#include <unistd.h>         // for dup / access
 #include <fcntl.h>          // for open
 #include <errno.h>          // for errno
 #include <seccomp.h>        // for seccomp_xxx
@@ -53,7 +57,6 @@ static int set_seccomp_strict()
     printf("setting seccomp strict\n");
     prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT);
 }
-
 
 int test_seccomp_strict()
 {
@@ -79,6 +82,7 @@ static int set_seccomp_filter()
     seccomp_rule_add(ctx, SCMP_ACT_LOG, SCMP_SYS(access), 0);
     seccomp_rule_add(ctx, SCMP_ACT_ERRNO(16), SCMP_SYS(openat), 0);
 
+    // use args as part of filter
     seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(dup), 1,
                      SCMP_A0(SCMP_CMP_EQ, 1));
 
@@ -94,7 +98,7 @@ int test_seccomp_filter()
 
     set_seccomp_filter();
 
-    fd = open("/etc/hosts", O_RDONLY);
+    fd = open("/etc/hosts", O_RDONLY);  // get errno 16 here
     printf("open(%d) file /etc/hosts fd: %d, errno: %d\n", SCMP_SYS(openat), fd, errno);
 
     ret = access("/etc/hosts", F_OK);
@@ -104,7 +108,8 @@ int test_seccomp_filter()
     printf("dup(%d) fd 1\n", SCMP_SYS(dup));
 
     (void)dup(2);
-    printf("YOU SHOULD NOT SEE ME!!!\n");}
+    printf("YOU SHOULD NOT SEE ME!!!\n");
+}
 
 int main()
 {
@@ -115,7 +120,9 @@ int main()
 
 ```
 
+### Seccomp Notify
 
+待补充
 
 ### 参考资料
 
